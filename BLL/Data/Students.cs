@@ -37,7 +37,6 @@ namespace BLL
             return result;
         }
 
-
         public void Remove(CurrentPerson student)
         {
             var result = _students.Remove((CurrentStudent)student);

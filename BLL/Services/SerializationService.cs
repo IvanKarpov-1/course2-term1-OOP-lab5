@@ -19,9 +19,9 @@ namespace BLL
 
     public class SerializationService
     {
-        private SerializationType _type;
-        private string _connection = AppDomain.CurrentDomain.BaseDirectory;
-        private string _name = "";
+        public SerializationType Type { get; private set; }
+        public string Connection { get; private set; } = AppDomain.CurrentDomain.BaseDirectory;
+        public string Name { get; private set; } = "";
 
         public void SetSerializationType(int type)
         {
@@ -29,39 +29,40 @@ namespace BLL
             {
                 case 1:
                 {
-                    _type = SerializationType.Binary;
+                    Type = SerializationType.Binary;
                     break;
                 }
                 case 2:
                 {
-                    _type = SerializationType.Xml;
+                    Type = SerializationType.Xml;
                     break;
                 }
                 case 3:
                 {
-                    _type = SerializationType.Json;
+                    Type = SerializationType.Json;
                     break;
                 }
                 case 4:
                 {
-                    _type = SerializationType.Custom; 
+                    Type = SerializationType.Custom; 
                     break;
                 }
                 default:
                 {
-                    return;
+                    Type = SerializationType.Binary;
+                    break;
                 }
             }
         }
 
         public void SetConnection(string path)
         {
-            _connection = path;
+            Connection = path;
         }
 
         public void SetName(string name)
         {
-            _name = name;
+            Name = name;
         }
 
         public void SerializeStudents(EntityService students)
@@ -72,7 +73,7 @@ namespace BLL
                 var studentsList = temp.Select(student => EntityCreator.CreateStudent(student.FirstName,
                     student.LastName, student.Course, student.StudentId,
                     student.Gpa, student.Country, student.NumberOfScorebook)).ToList();
-                GetEntityContext<List<Student>>(_connection + _name + ".students").SetData(studentsList);
+                GetEntityContext<List<Student>>(Connection + Name + ".students").SetData(studentsList);
             }
             catch (Exception ex)
             {
@@ -87,7 +88,7 @@ namespace BLL
                 var temp = managers.Persons.GetData().Cast<CurrentManager>().ToList();
                 var managersList = temp.Select(manager => EntityCreator.CreateManager(manager.FirstName,
                     manager.LastName, manager.CountOfSubordinates, manager.Salary)).ToList();
-                GetEntityContext<List<Manager>>(_connection + _name + ".managers").SetData(managersList);
+                GetEntityContext<List<Manager>>(Connection + Name + ".managers").SetData(managersList);
             }
             catch (Exception ex)
             {
@@ -104,7 +105,7 @@ namespace BLL
                     EntityCreator.CreateMcdonaldsWorker(
                         mcdonaldsWorker.FirstName, mcdonaldsWorker.LastName, mcdonaldsWorker.Diploma,
                         mcdonaldsWorker.Salary)).ToList();
-                GetEntityContext<List<McdonaldsWorker>>(_connection + _name + ".mcdonaldsWorkers").SetData(mcdonaldsWorkersList);
+                GetEntityContext<List<McdonaldsWorker>>(Connection + Name + ".mcdonaldsWorkers").SetData(mcdonaldsWorkersList);
             }
             catch (Exception ex)
             {
@@ -116,7 +117,7 @@ namespace BLL
         {
             try
             {
-                var studentsList = GetEntityContext<List<Student>>(_connection + _name + ".students").GetData();
+                var studentsList = GetEntityContext<List<Student>>(Connection + Name + ".students").GetData();
                 students.Persons.Clear();
                 foreach (var student in studentsList)
                 {
@@ -134,7 +135,7 @@ namespace BLL
         {
             try
             {
-                var managersList = GetEntityContext<List<Manager>>(_connection + _name + ".managers").GetData();
+                var managersList = GetEntityContext<List<Manager>>(Connection + Name + ".managers").GetData();
                 managers.Persons.Clear();
                 foreach (var manager in managersList)
                 {
@@ -152,7 +153,7 @@ namespace BLL
             try
             {
                 var mcdonaldsWorkersList =
-                    GetEntityContext<List<McdonaldsWorker>>(_connection + _name + ".mcdonaldsWorkers").GetData();
+                    GetEntityContext<List<McdonaldsWorker>>(Connection + Name + ".mcdonaldsWorkers").GetData();
                 mcdonaldsWorkers.Persons.Clear();
                 foreach (var mcdonaldsWorker in mcdonaldsWorkersList)
                 {
@@ -170,7 +171,7 @@ namespace BLL
         {
             var entityContext = new EntityContext<T>(connection);
 
-            switch (_type)
+            switch (Type)
             {
                 case SerializationType.Binary:
                 {
